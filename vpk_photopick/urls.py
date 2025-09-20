@@ -1,15 +1,20 @@
 from django.contrib import admin
-from django.urls import path, include
-from rest_framework.routers import DefaultRouter
-from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
-from accounts.views import UserViewSet, RegistrationView
 from django.http import JsonResponse
+from django.urls import path, include
+
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+
+from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+
+from accounts.views import UserViewSet, RegistrationView
+from subscriptions.views import SubscriptionViewSet
 
 
 # Show users
 router = DefaultRouter()
 router.register(r'accounts', UserViewSet, basename='accounts')
+router.register(r'subscriptions', SubscriptionViewSet, basename='subscriptions')
 
 
 def health(_request):

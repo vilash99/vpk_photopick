@@ -12,7 +12,7 @@ from .serializers import (
     UserCreateSerializer,
     UserUpdateSerializer,
 )
-from .permissions import IsAuthenticatedAndSelfOrSuperuser
+from .permissions import IsOwnerOrStaff
 
 User = get_user_model()
 
@@ -34,7 +34,7 @@ class UserViewSet(viewsets.ModelViewSet):
     - Regular users can only see themselves.
     """
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticatedAndSelfOrSuperuser]
+    permission_classes = [IsOwnerOrStaff]
 
     queryset = User.objects.all()
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]

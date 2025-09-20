@@ -26,8 +26,9 @@ INSTALLED_APPS = [
     'corsheaders',
 
     # local apps
-    'accounts',
-    'common',
+    'accounts.apps.AccountsConfig',
+    'common.apps.CommonConfig',
+    'subscriptions.apps.SubscriptionsConfig',
 ]
 
 MIDDLEWARE = [

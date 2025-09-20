@@ -1,5 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from django.db import transaction
+
+from subscriptions.models import Subscription
 
 User = get_user_model()
 
@@ -44,11 +47,15 @@ class UserCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'confirm_password': 'Passwords do not match.'})
         return attrs
 
+    @transaction.atomic
     def create(self, validated_data):
          # Delegate to manager so password hashing is handled once
         validated_data.pop('confirm_password')
         password = validated_data.pop('password')
         user = User.objects.create_user(password=password, **validated_data)
+
+        # Assign a FREE subscription to user immediately
+        Subscription.objects.get_or_create(user=user)
         return user
 
 
