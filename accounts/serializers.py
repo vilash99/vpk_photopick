@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.db import transaction
 
 from subscriptions.models import Subscription
+from subscriptions.serializers import SubscriptionSerializer
 
 User = get_user_model()
 
@@ -15,12 +16,13 @@ class UserListSerializer(serializers.ModelSerializer):
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
+    subscription = SubscriptionSerializer(read_only=True)
     class Meta:
         model = User
         fields = (
             'id', 'name', 'email', 'phone', 'studio_name',
             'website_link', 'whatsapp_link', 'instagram_link',
-            'facebook_link', 'youtube_link', 'is_active',
+            'facebook_link', 'youtube_link', 'is_active', 'subscription',
             'is_staff','is_superuser', 'created_at', 'updated_at'
         )
         read_only_fields = ('id', 'created_at', 'updated_at', 'is_staff', 'is_superuser')

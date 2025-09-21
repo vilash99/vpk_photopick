@@ -36,7 +36,7 @@ class UserViewSet(viewsets.ModelViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsOwnerOrStaff]
 
-    queryset = User.objects.all()
+    queryset = User.objects.select_related('subscription')
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['email', 'name', 'phone']
     ordering = ['name']

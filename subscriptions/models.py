@@ -1,9 +1,12 @@
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.core.exceptions import ValidationError
 from django.conf import settings
+
 from common.models import TimeStampedUUIDModel
+# from photos.models import Photo
 
 
 User = settings.AUTH_USER_MODEL
@@ -89,6 +92,20 @@ class Subscription(TimeStampedUUIDModel):
         if not self.current_period_end:
             return False
         return self.current_period_end >= timezone.now()
+
+    @cached_property
+    def photos_used(self) -> int:
+        """
+        Total photos uploaded by this subscription's user.
+        Assumes a Photo model with FK to User: Photo(user=..., ...)
+        """
+        # return Photo.objects.filter(user=self.user).count()
+        return 0
+
+    @property
+    def photos_remaining(self) -> int:
+        # return max(self.upload_limit - self.photos_used, 0)
+        return self.upload_limit
 
     def clean(self):
         # App-level validation mirroring DB constraints, gives nicer messages

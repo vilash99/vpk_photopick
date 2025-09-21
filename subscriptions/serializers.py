@@ -16,8 +16,8 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'user', 'plan', 'status',
             'stripe_customer_id', 'stripe_subscription_id',
-            'current_period_end',
-            'is_free', 'is_paid', 'is_current', 'upload_limit',
+            'current_period_end', 'is_free', 'is_paid', 'is_current',
+            'upload_limit', 'photos_used', 'photos_remaining',
             'created_at', 'updated_at',
         )
         read_only_fields = ('id', 'user', 'created_at', 'updated_at')
