@@ -25,11 +25,13 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'django_filters',
     'corsheaders',
+    'storages',
 
     # local apps
     'accounts.apps.AccountsConfig',
     'common.apps.CommonConfig',
     'subscriptions.apps.SubscriptionsConfig',
+    'customers.apps.CustomersConfig',
 ]
 
 MIDDLEWARE = [
@@ -166,3 +168,20 @@ SIMPLE_JWT = {
     'UPDATE_LAST_LOGIN': True,
     'BLACKLIST_AFTER_ROTATION': True,
 }
+
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+WASABI_ACCESS_KEY = config('WASABI_ACCESS_KEY')
+WASABI_SECRET_KEY = config('WASABI_SECRET_KEY')
+WASABI_BUCKET_NAME = config('WASABI_BUCKET_NAME')
+
+# Wasabi endpoint (region-specific)
+WASABI_ENDPOINT = 'https://s3.us-east-1.wasabisys.com'
+WASABI_REGION = 'us-east-1'  # change if you use a different region
+
+# If your bucket is public and you want to compute public URLs:
+WASABI_PUBLIC_BASE = f"{WASABI_ENDPOINT.rstrip('/')}/{WASABI_BUCKET_NAME}"
+
+AWS_QUERYSTRING_AUTH = False   # make URLs public, set True if you want signed URLs
+AWS_DEFAULT_ACL = None         # required to avoid ACL warnings

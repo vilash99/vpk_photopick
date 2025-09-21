@@ -1,12 +1,10 @@
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, F
 from django.utils import timezone
-from django.utils.functional import cached_property
 from django.core.exceptions import ValidationError
 from django.conf import settings
 
 from common.models import TimeStampedUUIDModel
-# from photos.models import Photo
 
 
 User = settings.AUTH_USER_MODEL
@@ -41,6 +39,7 @@ class Subscription(TimeStampedUUIDModel):
     status = models.CharField(max_length=20, choices=SubscriptionStatus.choices, default=SubscriptionStatus.ACTIVE)
 
     current_period_end = models.DateTimeField(null=True, blank=True)
+    photos_used_cached = models.PositiveIntegerField(default=0)
 
     class Meta:
         indexes = [
@@ -93,19 +92,31 @@ class Subscription(TimeStampedUUIDModel):
             return False
         return self.current_period_end >= timezone.now()
 
-    @cached_property
+    @property
     def photos_used(self) -> int:
-        """
-        Total photos uploaded by this subscription's user.
-        Assumes a Photo model with FK to User: Photo(user=..., ...)
-        """
-        # return Photo.objects.filter(user=self.user).count()
-        return 0
+        return int(self.photos_used_cached or 0)
 
     @property
     def photos_remaining(self) -> int:
-        # return max(self.upload_limit - self.photos_used, 0)
-        return self.upload_limit
+        return max(self.upload_limit - self.photos_used, 0)
+
+    def can_upload(self, n: int = 1) -> bool:
+        return self.photos_used + n <= self.upload_limit
+
+    @classmethod
+    def lock_for_user(cls, user_id):
+        """
+        Row-lock the subscription for this user (within an outer transaction).
+        """
+        return cls.objects.select_for_update().get(user_id=user_id)
+
+    @classmethod
+    def atomic_bump(cls, pk, delta: int):
+        """
+        Atomic in-DB increment/decrement using F() to prevent races.
+        """
+        cls.objects.filter(pk=pk).update(photos_used_cached=F('photos_used_cached') + delta)
+
 
     def clean(self):
         # App-level validation mirroring DB constraints, gives nicer messages

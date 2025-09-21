@@ -9,6 +9,8 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     is_paid = serializers.ReadOnlyField()
     is_current = serializers.ReadOnlyField()
     upload_limit = serializers.IntegerField(read_only=True)
+    photos_used = serializers.IntegerField(read_only=True)
+    photos_remaining = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Subscription
